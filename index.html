@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxelit! — any city on Earth, in voxels</title>
+    <meta name="description" content="Pick any spot on Earth and Voxelit! builds it in voxels from open data, right in your browser.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dialog.css">
+</head>
+<body class="home">
+    <header class="wrap">
+        <a class="brand" href="index.html"><span id="logo"></span><span>Voxelit<b>!</b></span></a>
+        <nav><a href="#places" id="nav-places" class="hidden">Your places</a><a href="#cities">Sample cities</a><a href="#how">How it works</a><a href="explore.html">World map</a></nav>
+    </header>
+
+    <main class="wrap">
+        <section class="hero">
+            <div>
+                <h1>Any city on Earth,<br><em>one block at a time.</em></h1>
+                <p class="lead">Pick a spot on the map and Voxelit! builds it in 5&nbsp;m voxels from open data — buildings,
+                    terrain, trees and rivers — right in your browser. Then explore it as a flying cat.</p>
+                <div class="cta">
+                    <a class="btn primary" href="explore.html">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                        Find your city</a>
+                    <a class="btn" href="view.html?upload=1">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+                        Open a .vxl.gz file</a>
+                </div>
+            </div>
+            <div class="hero-art" id="hero-art"></div>
+        </section>
+
+        <section id="places" class="hidden">
+            <div class="section-title"><h2>Your places</h2><span id="places-count"></span></div>
+            <div class="cities places" id="place-cards"></div>
+        </section>
+
+        <section id="cities">
+            <div class="section-title"><h2>Sample cities</h2><span>1 km² around a landmark · built live from open data</span></div>
+            <div class="cities" id="city-cards"></div>
+        </section>
+
+        <section id="how">
+            <div class="section-title"><h2>How it works</h2></div>
+            <div class="steps">
+                <div class="step"><div class="n">01</div><h3>Pick a spot</h3>
+                    <p>Search for a place or zoom into the world map and click. Choose a 0.5, 1 or 2 km square.</p></div>
+                <div class="step"><div class="n">02</div><h3>Open data comes in</h3>
+                    <p>Buildings, roads and water from OpenStreetMap, terrain from elevation tiles, trees and grass read from satellite imagery.</p></div>
+                <div class="step"><div class="n">03</div><h3>Your browser voxelizes</h3>
+                    <p>Everything becomes 5 m blocks on your own device — no server. Save the result as a .vxl.gz file.</p></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="wrap">
+            <span>Map data © OpenStreetMap contributors · Imagery © Esri · Mapzen Terrarium terrain · Weather: Open-Meteo</span>
+            <span>Universitas Gadjah Mada · <a href="mailto:calvin.wijaya@ugm.ac.id">calvin.wijaya@ugm.ac.id</a></span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/places.js"></script>
+    <script type="module">
+        import { CONFIG, viewUrl } from './js/config.js';
+        import { isoTown, isoVoxels, LANDMARKS, FLAGS, CITY_STYLE, LOGO } from './js/isoart.js';
+        const $ = id => document.getElementById(id);
+        const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const coord = (lat, lon) => `${Math.abs(lat).toFixed(2)}°${lat < 0 ? 'S' : 'N'}, ${Math.abs(lon).toFixed(2)}°${lon < 0 ? 'W' : 'E'}`;
+        $('logo').outerHTML = LOGO;
+        $('hero-art').innerHTML = isoTown(3, 13, { cube: 24 });
+
+        // ---------- sample cities: voxel landmark, flag, country ----------
+        $('city-cards').innerHTML = CONFIG.SAMPLE_CITIES.map(c => {
+            const st = CITY_STYLE[c.id] || { sky: ['#27272a', '#18181b'] };
+            const art = LANDMARKS[c.id] ? isoVoxels(LANDMARKS[c.id](), { label: `${c.place}, ${c.name}` }) : isoTown(7, 9, { cube: 16 });
+            return `
+            <a class="city" href="${viewUrl({ ...c, name: c.name + ' · ' + c.place })}">
+                <div class="art" style="--sky1:${st.sky[0]};--sky2:${st.sky[1]}">${art}</div>
+                <div class="body">
+                    <h3>${st.flag ? `<span class="flag" title="${st.country}">${FLAGS[st.flag]()}</span>` : ''}${c.name}</h3>
+                    <div class="meta">${c.place} · ${st.country || ''}<br>${coord(c.lat, c.lon)}</div>
+                </div>
+                <span class="go">Open →</span>
+            </a>`;
+        }).join('');
+
+        // ---------- your places (saved from the viewer, kept in this browser) ----------
+        function renderPlaces() {
+            const list = VXPlaces.list();
+            $('places').classList.toggle('hidden', !list.length);
+            $('nav-places').classList.toggle('hidden', !list.length);
+            $('places-count').textContent = list.length ? `${list.length} saved in this browser` : '';
+            $('place-cards').innerHTML = list.map(p => `
+                <div class="city place" data-id="${p.id}">
+                    <a class="art" href="${VXPlaces.url(p)}" aria-label="Open ${esc(p.name)}">${p.thumb ? `<img src="${p.thumb}" alt="">` : isoTown(p.saved % 97, 9, { cube: 16 })}</a>
+                    <div class="body">
+                        <h3><a href="${VXPlaces.url(p)}">${esc(p.name)}</a></h3>
+                        <div class="meta">${coord(p.lat, p.lon)} · ${p.size >= 1000 ? p.size / 1000 + '&nbsp;km' : p.size + '&nbsp;m'}&nbsp;square<br>Saved ${new Date(p.saved).toLocaleDateString()}</div>
+                    </div>
+                    <div class="place-tools">
+                        <button data-act="rename" title="Rename">✎</button>
+                        <button data-act="delete" title="Remove">🗑</button>
+                    </div>
+                    <a class="go" href="${VXPlaces.url(p)}">Open →</a>
+                </div>`).join('');
+        }
+        $('place-cards').addEventListener('click', async e => {
+            const act = e.target.dataset.act; if (!act) return;
+            const card = e.target.closest('.place'), p = VXPlaces.list().find(p => p.id === card.dataset.id); if (!p) return;
+            if (act === 'rename') {
+                const name = await vxPrompt({ title: 'Rename place', value: p.name, confirm: 'Rename' });
+                if (name) { VXPlaces.rename(p.id, name); renderPlaces(); }
+            } else if (act === 'delete') {
+                const ok = await vxConfirm({ title: `Remove “${p.name}”?`, text: 'It will be removed from Your places in this browser. You can always find it again on the world map.',
+                                             confirm: 'Remove', cancel: 'Keep', danger: true, imageUrl: p.thumb });
+                if (ok) { VXPlaces.remove(p.id); renderPlaces(); vxToast(`“${p.name}” removed`); }
+            }
+        });
+        renderPlaces();
+        addEventListener('storage', e => { if (e.key === 'voxelit.places') renderPlaces(); });   // saved in another tab
+    </script>
+</body>
+</html>

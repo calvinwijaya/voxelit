@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find your city — Voxelit!</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="map" class="fullscreen"></div>
+
+    <div id="explore-panel" class="panel">
+        <a class="brand" href="index.html"><span id="logo"></span><span>Voxelit<b>!</b></span></a>
+        <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <input id="search" type="search" placeholder="Search a city, campus, landmark…" autocomplete="off">
+        </div>
+        <ul id="results" class="results"></ul>
+        <div class="chips" id="chips"></div>
+        <p class="hint" id="hint">Zoom in and click anywhere to choose the area to voxelize.</p>
+    </div>
+
+    <div id="select-panel" class="panel hidden">
+        <div class="where"><b id="sel-name">Selected area</b><span id="sel-coords"></span></div>
+        <div class="seg" id="size-seg"></div>
+        <a id="build-btn" class="btn primary" href="#">Build voxels →</a>
+    </div>
+
+    <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+    <script src="js/places.js"></script>
+    <script type="module" src="js/explore.js"></script>
+</body>
+</html>

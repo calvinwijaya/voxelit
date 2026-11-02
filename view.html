@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Voxelit! — viewer</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#18181b">
+    <link rel="stylesheet" href="css/sim.css">
+    <link rel="stylesheet" href="css/dialog.css">
+</head>
+<body>
+
+    <div id="loading"><div id="loading-text">Starting…</div><div class="lbar"><i id="loading-bar"></i></div></div>
+
+    <div id="dropzone" class="hidden">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        <h3>Open a .vxl.gz file</h3>
+        <p>Drop it here, or choose a file. Voxelit! files and Voxel FT UGM files (VXL1 / VXL2) both work.
+            Nothing is uploaded — it stays on your device.</p>
+        <label class="btn-cta">Choose file<input id="file-input" type="file" accept=".gz,.vxl,application/gzip" hidden></label>
+        <a href="index.html" class="back">← Home</a>
+    </div>
+
+    <div id="sidebar-container">
+        <div id="sidebar">
+            <div class="vx-head">
+                <a class="vx-brand" href="index.html" title="Voxelit! home">
+                    <svg viewBox="0 0 32 32" aria-hidden="true"><polygon points="16,3 28,10 16,17 4,10" fill="#fbbf24"/><polygon points="4,10 16,17 16,30 4,23" fill="#d97706"/><polygon points="28,10 16,17 16,30 28,23" fill="#92400e"/><polygon points="16,7.5 21,10.4 16,13.3 11,10.4" fill="#fde68a"/></svg>
+                    Voxelit<b>!</b></a>
+                <div class="vx-nav"><a id="back-home" class="vx-btn" href="index.html" title="Home page">⌂ Home</a><a id="back-map" class="vx-btn" href="explore.html" title="Pick another place">World map</a></div>
+            </div>
+            <h1 class="app-title" id="place-name">Loading…</h1>
+            <div id="place-coords" class="subtle"></div>
+
+            <!-- ============ THIS AREA ============ -->
+            <details class="section" id="sec-area">
+                <summary>This Area</summary>
+                <div class="kv" id="area-stats"></div>
+                <div class="vx-warn hidden" id="area-warnings"></div>
+                <div class="seg" style="margin-top:10px">
+                    <button id="download-btn">Download .vxl.gz</button>
+                    <button id="share-btn">Copy link</button>
+                    <button id="open-btn">Open file</button>
+                </div>
+                <div class="seg" style="margin-top:6px">
+                    <button id="save-btn" class="save-place">☆ Save place</button>
+                </div>
+            </details>
+
+            <!-- ============ VIEW MODE ============ -->
+            <details class="section" open>
+                <summary>View Mode</summary>
+                <div class="seg">
+                    <button id="view-orbit" class="active">Orbit</button>
+                    <button id="view-fp">First person</button>
+                    <button id="view-tp">Third person</button>
+                </div>
+                <div class="hint touch-only">
+                    You start in the middle of the area. In third person you play a cat that grows wings in fly mode.<br>
+                    <b>Left thumb</b>: joystick (push to the edge to run) · <b>Right thumb</b>: drag to look ·
+                    <b>Pinch</b>: zoom the cat camera. Landscape orientation works best.
+                </div>
+                <div class="hint desktop-only">
+                    You start in the middle of the area. In third person you play a cat that grows wings in fly mode.<br>
+                    <kbd>W A S D</kbd> move · <kbd>Mouse</kbd> look · <kbd>Space</kbd> jump · <kbd>Shift</kbd> run ·
+                    <kbd>G</kbd> fly · <kbd>V</kbd> switch 1st/3rd · <kbd>F</kbd> ignite at crosshair ·
+                    <kbd>R</kbd> respawn · <kbd>Wheel</kbd> cat camera distance · <kbd>Esc</kbd> release mouse, <kbd>Esc</kbd> again = orbit
+                </div>
+            </details>
+
+            <!-- ============ TIME ============ -->
+            <details class="section" open>
+                <summary>Time &amp; Sun</summary>
+                <div class="seg">
+                    <button id="time-live" class="active">● Live (now)</button>
+                    <button id="play-btn">Play</button>
+                </div>
+                <div class="slider-row" style="margin-top:10px">
+                    <span>00:00</span>
+                    <input type="range" id="time-slider" min="0" max="1439" step="5" value="720" style="accent-color: #fbbf24;">
+                    <span>23:59</span>
+                </div>
+                <div id="current-time-label" class="center-label" style="color:#fbbf24">--:--</div>
+                <label class="field">Date</label>
+                <input type="date" id="date-input">
+                <div class="hint">Live follows the real local clock of this area, so a visit at night shows night. Moving the slider or date switches to simulation (shadow analysis for any day).</div>
+            </details>
+
+            <!-- ============ WEATHER & AIR ============ -->
+            <details class="section" id="sec-weather">
+                <summary>Weather &amp; Air Quality</summary>
+                <div class="row-between">
+                    <div id="wx-status" class="status">—</div>
+                    <button id="wx-refresh" class="btn-default" title="Refresh now">⟳</button>
+                </div>
+                <div id="wx-now" class="wx-card"></div>
+                <div id="wx-hours" class="wx-hours"></div>
+                <label class="field">Scene weather</label>
+                <select id="wx-mode">
+                    <option value="auto">Live (follow real weather)</option>
+                    <option value="clear">Clear</option>
+                    <option value="cloudy">Cloudy</option>
+                    <option value="rain">Rain</option>
+                    <option value="storm">Thunderstorm</option>
+                </select>
+                <h4 style="margin-top:16px">Air quality</h4>
+                <div id="aq-now" class="wx-card"></div>
+                <div id="aq-station" class="subtle"></div>
+            </details>
+
+            <!-- ============ WIND ============ -->
+            <details class="section">
+                <summary>Wind</summary>
+                <div class="seg">
+                    <button id="wind-live-btn">Live data</button>
+                    <button id="wind-manual-btn">Manual</button>
+                    <button id="wind-refresh" title="Refresh live wind">⟳</button>
+                </div>
+                <div id="wind-status" class="status">—</div>
+                <label class="field">Speed <b id="wind-speed-label"></b> <i id="wind-beaufort"></i></label>
+                <input type="range" id="wind-speed" min="0" max="25" step="0.5" value="2" style="accent-color:#38bdf8">
+                <label class="field">Direction (from) <b id="wind-dir-label"></b></label>
+                <input type="range" id="wind-dir" min="0" max="359" step="1" value="90" style="accent-color:#38bdf8">
+                <div id="wind-meta" class="subtle"></div>
+                <div class="legend-item" style="margin-top:8px">
+                    <input type="checkbox" id="wind-show" checked>
+                    <label for="wind-show">Show wind streamlines</label>
+                </div>
+            </details>
+
+            <!-- ============ ROADS & CARS ============ -->
+            <details class="section" id="sec-cars">
+                <summary>Roads &amp; Cars</summary>
+                <div id="cars-status" class="status">—</div>
+                <label class="field">Number of cars <b id="cars-density-label"></b></label>
+                <input type="range" id="cars-density" min="0" max="100" step="5" value="60" style="accent-color:#94a3b8">
+                <div class="legend-item" style="margin-top:8px">
+                    <input type="checkbox" id="cars-show" checked>
+                    <label for="cars-show">Show cars</label>
+                </div>
+                <div class="hint">Roads come from OpenStreetMap. The cars are a simple simulation, not live traffic: they wander the road network at typical speeds for each road type, follow one-way streets, keep to the local side of the road and turn their headlights on at night.</div>
+            </details>
+
+            <!-- ============ FIRE ============ -->
+            <details class="section">
+                <summary>Fire Spread</summary>
+                <button id="fire-arm" class="btn-wide">Place ignition point</button>
+                <div class="seg" style="margin-top:8px">
+                    <button id="fire-play">Run</button>
+                    <button id="fire-step">Step</button>
+                    <button id="fire-reset">Reset</button>
+                </div>
+                <label class="field">Simulation speed <b id="fire-speed-label"></b></label>
+                <input type="range" id="fire-speed" min="1" max="20" step="1" value="4" style="accent-color:#f97316">
+                <label class="field">Relative humidity <b id="fire-humidity-label"></b></label>
+                <input type="range" id="fire-humidity" min="10" max="100" step="1" value="60" style="accent-color:#f97316">
+                <label class="field">Building flammability <b id="fire-bldg-label"></b></label>
+                <input type="range" id="fire-bldg" min="0" max="300" step="5" value="100" style="accent-color:#f97316">
+                <div id="fire-stats" class="stats"></div>
+                <div class="hint">Spread uses the current wind (live or manual). Humidity follows live data until you move the slider. Rain slows the fire. Embers jump downwind above 5 m/s.</div>
+            </details>
+
+            <!-- ============ BASEMAP ============ -->
+            <details class="section">
+                <summary>Basemap</summary>
+                <select id="basemap-select">
+                    <option value="satellite">Satellite (Esri)</option>
+                    <option value="osm">OpenStreetMap</option>
+                    <option value="light">CARTO Light</option>
+                    <option value="dark">CARTO Dark</option>
+                    <option value="none">None</option>
+                </select>
+                <div id="basemap-status" class="subtle"></div>
+                <div class="legend-item" style="margin-top:8px">
+                    <input type="checkbox" id="basemap-ground">
+                    <label for="basemap-ground">Colour ground voxels from imagery</label>
+                </div>
+                <div class="hint">The map surface follows the terrain under the voxels and continues it smoothly outside.</div>
+            </details>
+
+            <!-- ============ CAT AVATAR ============ -->
+            <details class="section" id="sec-cat">
+                <summary>Cat Avatar</summary>
+                <div id="cat-grid" class="cat-grid"></div>
+                <div class="hint">Your cat walks around in Third person (and grows wings with <kbd>G</kbd>). The choice is remembered on this device.</div>
+            </details>
+
+            <div class="metadata">
+                <p><strong>Data:</strong> <span id="area-sources"></span></p>
+                <p><strong>Live data:</strong> weather, wind &amp; air quality from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0; air quality from CAMS / Copernicus).</p>
+                <p><strong>Voxelit!</strong> · Universitas Gadjah Mada · <a href="mailto:calvin.wijaya@ugm.ac.id">calvin.wijaya@ugm.ac.id</a></p>
+            </div>
+        </div>
+        <button id="toggle-btn" onclick="toggleSidebar()">❮</button>
+    </div>
+
+    <div id="compass">N</div>
+
+    <div id="toolbar" aria-label="View tools">
+        <button id="tool-rotate" title="Rotate around automatically"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></button>
+        <button id="tool-shot" title="Take a picture (P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg></button>
+        <button id="tool-save" title="Save to Your places"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>
+    </div>
+
+    <div id="minimap">
+        <canvas id="minimap-canvas" width="360" height="360"></canvas>
+        <button id="mm-in" title="Zoom in">+</button>
+        <button id="mm-out" title="Zoom out">−</button>
+    </div>
+
+    <button id="wx-chip" title="Weather & air quality">
+        <span id="chip-time">--:--</span><span id="chip-wx"></span><span id="chip-aq"></span>
+    </button>
+
+    <div id="crosshair"></div>
+    <div id="hud">
+        <span id="hud-mode"></span><span id="hud-fly" class="pill">FLY</span><span id="hud-pos"></span>
+        <div id="hud-unlocked">Mouse released — click the scene to look around · <kbd>Esc</kbd> again for orbit view</div>
+    </div>
+    <div id="underwater"></div>
+
+    <div id="touch-ui">
+        <button id="touch-exit">✕ Exit</button>
+        <div id="joy"><div id="joy-knob"></div></div>
+        <div id="touch-btns">
+            <button data-key="KeyV" class="small">1st/3rd</button>
+            <button data-key="KeyG" class="small">Fly</button>
+            <button data-key="KeyF" class="small fire">Ignite</button>
+            <button data-key="KeyC" data-hold class="fly-only">Down</button>
+            <button data-key="Space" data-hold class="big">Jump</button>
+        </div>
+    </div>
+    <div id="toast"></div>
+    <div id="attribution"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="js/dialog.js"></script>
+    <script src="js/places.js"></script>
+    <!-- view-boot.js builds or opens the area, then loads js/sim/*.js in order -->
+    <script type="module" src="js/view-boot.js"></script>
+</body>
+</html>

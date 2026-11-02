@@ -1,0 +1,22 @@
+/* SweetAlert2 dialogs in the Voxelit style (used by js/dialog.js) */
+.vx-swal { border: 1px solid #3f3f46 !important; border-radius: 14px !important; box-shadow: 0 24px 70px rgba(0,0,0,.55) !important;
+    font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; width: min(420px, calc(100vw - 32px)) !important; }
+.vx-swal .swal2-title { font-size: 19px !important; font-weight: 700; color: #f8fafc !important; padding-top: 20px !important; }
+.vx-swal .swal2-html-container { font-size: 14px !important; color: #a1a1aa !important; line-height: 1.5; }
+.vx-swal .swal2-image { border-radius: 12px; background: #27272a; object-fit: contain; }
+.vx-swal .swal2-actions { gap: 8px; margin-top: 18px !important; }
+.vx-swal-ok, .vx-swal-cancel { border: 0; border-radius: 9px; padding: 10px 18px; font: 600 14px Inter, 'Segoe UI', sans-serif; cursor: pointer; transition: background .15s; }
+.vx-swal-ok { background: #fbbf24; color: #1b1405; }
+.vx-swal-ok:hover { background: #fcd34d; }
+.vx-swal-ok.vx-swal-danger { background: #dc2626; color: #fff; }
+.vx-swal-ok.vx-swal-danger:hover { background: #ef4444; }
+.vx-swal-cancel { background: #3f3f46; color: #e4e4e7; }
+.vx-swal-cancel:hover { background: #52525b; }
+.vx-swal-ok:focus-visible, .vx-swal-cancel:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+.vx-swal-input { background: #27272a !important; color: #e4e4e7 !important; border: 1px solid #3f3f46 !important; border-radius: 8px !important;
+    font-size: 14px !important; box-shadow: none !important; }
+.vx-swal-input:focus { border-color: #fbbf24 !important; }
+.vx-swal .swal2-validation-message { background: #27272a !important; color: #fca5a5 !important; }
+.vx-swal-toast { width: auto !important; padding: 8px 14px !important; }
+.vx-swal-toast .swal2-title { font-size: 14px !important; padding: 0 !important; margin: 0 8px !important; }
+.swal2-container { z-index: 100 !important; }
