@@ -471,3 +471,14 @@ body.touch.walking #toolbar { display: none; }
     #toolbar svg { width: 19px; height: 19px; }
 }
 @media (max-height: 500px) and (orientation: landscape) { #toolbar { top: 64px; right: 12px; } #toolbar button { width: 40px; height: 40px; } }
+
+/* ---------- solar analysis ---------- */
+.solar-toggle { margin-top: 12px; background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.25); border-radius: 6px; }
+.solar-toggle label { color: #fde68a; font-weight: 600; }
+#solar-panel { margin-top: 8px; }
+#solar-mode #solar-refresh { flex: 0 0 34px; }
+.solar-legend { margin: 8px 0 10px; }
+.solar-legend i { display: block; height: 10px; border-radius: 5px;
+    background: linear-gradient(90deg, #2d1b54, #4a1a6e, #781c6d, #a52c60, #cf4446, #ed6925, #fb9b06, #f7d13d, #fcffa4); }
+.solar-legend div { display: flex; justify-content: space-between; font-size: 10.5px; color: #a1a1aa; margin-top: 3px; }
+#solar-stats { margin-bottom: 4px; }

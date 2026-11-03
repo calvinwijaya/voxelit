@@ -85,6 +85,21 @@
                 <label class="field">Date</label>
                 <input type="date" id="date-input">
                 <div class="hint">Live follows the real local clock of this area, so a visit at night shows night. Moving the slider or date switches to simulation (shadow analysis for any day).</div>
+                <div class="legend-item solar-toggle">
+                    <input type="checkbox" id="solar-on">
+                    <label for="solar-on">☀ Solar analysis heatmap</label>
+                </div>
+                <div id="solar-panel" class="hidden">
+                    <div class="seg" id="solar-mode">
+                        <button data-m="now">At this time</button>
+                        <button data-m="day" class="active">Whole day</button>
+                        <button id="solar-refresh" title="Recalculate (e.g. after a fire)">⟳</button>
+                    </div>
+                    <div id="solar-status" class="status">—</div>
+                    <div class="solar-legend"><i></i><div><span>0</span><span id="solar-mid"></span><span id="solar-max"></span></div></div>
+                    <div class="kv" id="solar-stats"></div>
+                    <div class="hint">Sunlight reaching each voxel's best-lit face, with shadows from buildings and trees in this area. <b>Whole day</b> adds up the selected date (sun every 30 min); <b>At this time</b> follows the slider. Clear-sky model (no clouds), so it shows the potential — useful for comparing roofs for solar panels or finding shaded streets.</div>
+                </div>
             </details>
 
             <!-- ============ WEATHER & AIR ============ -->

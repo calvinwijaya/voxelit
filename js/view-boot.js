@@ -4,7 +4,7 @@ import { CONFIG as VX } from './config.js';
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-const SIM = ['voxel-grid', 'main', 'geo', 'weather', 'sky', 'wind', 'rain', 'fire', 'cats', 'cat-maker', 'player', 'basemap', 'cars', 'tools', 'touch', 'minimap'];
+const SIM = ['voxel-grid', 'main', 'geo', 'weather', 'sky', 'wind', 'rain', 'fire', 'cats', 'cat-maker', 'player', 'basemap', 'cars', 'tools', 'solar-core', 'solar', 'touch', 'minimap'];
 // used when an opened file carries no location (original Voxel FT UGM files)
 const FT_UGM = { lat: -7.7652, lon: 110.3725, name: 'Faculty of Engineering, Universitas Gadjah Mada' };
 

@@ -104,6 +104,20 @@ Axes: x = east, y = up, z = south, grid centred on the chosen lon/lat.
   Família, Shibuya Crossing, Gwanghwamun, Marina Bay Sands, Tiananmen) on a city-coloured sky, plus the country flag,
   all drawn as SVG in `js/isoart.js` — no photos to license or download.
 
+## Solar analysis (Time & Sun → ☀ Solar analysis heatmap, off by default)
+- **Model** (`js/sim/solar-core.js`): clear-sky sun — Meinel direct beam with Kasten–Young air mass, plus diffuse sky
+  light. For each exposed voxel face: `E = DNI · max(0, n·s) · lit + DHI · skyView`. `lit` is a ray traced through the
+  voxel grid toward the sun (Amanatides & Woo), so buildings and trees cast shadows; `skyView` is the open share of
+  12 sky directions (½ for walls). A voxel shows its best-lit face. Faces on the outer edge of the area are skipped.
+- **Whole day:** sun every 30 min over the selected date → kWh/m²/day. **At this time:** follows the time slider → W/m².
+  Runs in a Web Worker (`solar-worker.js`), about 1–2 s for 1 km² on a laptop; recalculates when the date
+  (whole day) or the time (every 5 simulated minutes) changes, ⟳ after a fire.
+- **Colours:** inferno-like ramp from 0 to the 98th percentile; the panel lists roof and street averages, the best
+  10 % of roofs and the share of ground in deep shade (< 30 % of the top value).
+- **Check:** an open roof at the equator gets ≈ 7.4 kWh/m² on a clear day, in line with clear-sky references. No clouds,
+  no reflections off other surfaces — it shows the potential, not a forecast.
+
 ## Next steps
 1. Individual buildings with exact height tags (Overpass / Overture) instead of the merged map-tile footprints.
 2. Google Open Buildings 2.5D heights for the Global South.
+3. Solar: cloud cover from Open-Meteo, monthly / yearly totals.
